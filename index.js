@@ -66,11 +66,60 @@ class Tree {
     return this.buildTree(duplicatesRemoved, 0, duplicatesRemoved.length - 1);
   }
 
-  insert(value) {}
+  insert(value, root = this.root) {
+    if (root === null) return new Node(value);
 
-  deleteItem(value) {}
+    if (root.data === value) return root;
 
-  find(value) {}
+    if (value < root.data) {
+      root.left = this.insert(value, root.left);
+    } else if (value > root.data) {
+      root.right = this.insert(value, root.right);
+    }
+
+    return root;
+  }
+
+  // Return leftmost child of arg;
+  getSuccessor(current) {
+    current = current.right;
+    while (current !== null && current.left !== null) {
+      current = current.left;
+    }
+    return current;
+  }
+
+  deleteItem(value, root = this.root) {
+    if (root === null) return root;
+    else if (root.data > value) {
+      root.left = this.deleteItem(value, root.left);
+    } else if (root.data < value) {
+      root.right = this.deleteItem(value, root.right);
+    } else {
+      // If no children or only children to the right:
+      if (root.left === null) return root.right;
+
+      // If only children to the left:
+      if (root.right === null) return root.left;
+
+      // If both children are present:
+      let successor = this.getSuccessor(root);
+      root.data = successor.data;
+      root.right = this.deleteItem(successor.data, root.right);
+    }
+
+    return root;
+  }
+
+  find(value, root = this.root) {
+    if (root === null) return false;
+    if (root.data === value) return root;
+    if (value < root.data) {
+      return this.find(value, root.left);
+    } else {
+      return this.find(value, root.right);
+    }
+  }
 
   levelOrder(callback) {}
 
@@ -91,5 +140,21 @@ class Tree {
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const test = new Tree(arr);
+test.insert(6);
+test.insert(2);
+console.log(test.find(29));
 
-test.prettyPrint();
+const prettyPrint = (node, prefix = '', isLeft = true) => {
+  if (node === null) {
+    return;
+  }
+  if (node.right !== null) {
+    prettyPrint(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
+  }
+  console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.data}`);
+  if (node.left !== null) {
+    prettyPrint(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
+  }
+};
+
+prettyPrint(test.root);
