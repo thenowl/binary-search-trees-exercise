@@ -121,15 +121,64 @@ class Tree {
     }
   }
 
-  levelOrder(callback) {}
+  isCallback(callback) {
+    if (!callback) {
+      throw new Error('No callback function provided!');
+    }
+    if (typeof callback !== 'function') {
+      throw new Error('Argument has to be of type function!');
+    }
+  }
 
-  inOrder(callback) {}
+  levelOrder(callback, root = this.root) {
+    this.isCallback(callback);
 
-  preOrder(callback) {}
+    const queue = [];
+    queue.push(root);
 
-  postOrder(callback) {}
+    while (queue.length > 0) {
+      callback(queue[0]);
+      if (queue[0].left !== null) queue.push(queue[0].left);
+      if (queue[0].right !== null) queue.push(queue[0].right);
+      queue.shift();
+    }
+  }
 
-  height(node) {}
+  inOrder(callback, root = this.root) {
+    if (root === null) return;
+    this.isCallback(callback);
+
+    this.inOrder(callback, root.left);
+    callback(root);
+    this.inOrder(callback, root.right);
+  }
+
+  preOrder(callback, root = this.root) {
+    if (root === null) return;
+    this.isCallback(callback);
+
+    callback(root);
+    this.preOrder(callback, root.left);
+    this.preOrder(callback, root.right);
+  }
+
+  postOrder(callback, root = this.root) {
+    if (root === null) return;
+    this.isCallback(callback);
+
+    this.postOrder(callback, root.left);
+    this.postOrder(callback, root.right);
+    callback(root);
+  }
+
+  height(node = this.root) {
+    if (node === null) return -1;
+
+    let left = this.height(node.left);
+    let right = this.height(node.right);
+
+    return left > right ? left + 1 : right + 1;
+  }
 
   depth(node) {}
 
@@ -142,7 +191,7 @@ const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const test = new Tree(arr);
 test.insert(6);
 test.insert(2);
-console.log(test.find(29));
+// console.log(test.find(5));
 
 const prettyPrint = (node, prefix = '', isLeft = true) => {
   if (node === null) {
@@ -158,3 +207,5 @@ const prettyPrint = (node, prefix = '', isLeft = true) => {
 };
 
 prettyPrint(test.root);
+
+console.log(test.height());
