@@ -6,7 +6,7 @@ class Node {
   }
 }
 
-class Tree {
+export default class Tree {
   constructor(array) {
     this.root = this.buildTreePrep(this.mergeSort(array));
   }
@@ -180,32 +180,35 @@ class Tree {
     return left > right ? left + 1 : right + 1;
   }
 
-  depth(node) {}
+  depth(node, root = this.root) {
+    if (!node) return false;
+    if (root === null) return -1;
+    if (root.data === node.data) return 0;
 
-  isBalanced() {}
+    let depth = 0;
+    if (node.data < root.data) {
+      depth += this.depth(node, root.left) + 1;
+    } else {
+      depth += this.depth(node, root.right) + 1;
+    }
 
-  rebalance() {}
+    return depth;
+  }
+
+  isBalanced() {
+    let heightLeft = this.height(this.root.left);
+    let heightRight = this.height(this.root.right);
+
+    return (
+      heightLeft === heightRight ||
+      heightLeft + 1 === heightRight ||
+      heightLeft - 1 === heightRight
+    );
+  }
+
+  rebalance() {
+    let tmp = [];
+    this.inOrder((node) => tmp.push(node.data));
+    this.root = this.buildTreePrep(this.mergeSort(tmp));
+  }
 }
-
-const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-const test = new Tree(arr);
-test.insert(6);
-test.insert(2);
-// console.log(test.find(5));
-
-const prettyPrint = (node, prefix = '', isLeft = true) => {
-  if (node === null) {
-    return;
-  }
-  if (node.right !== null) {
-    prettyPrint(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false);
-  }
-  console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.data}`);
-  if (node.left !== null) {
-    prettyPrint(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
-  }
-};
-
-prettyPrint(test.root);
-
-console.log(test.height());
